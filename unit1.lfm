@@ -1,0 +1,173 @@
+object Form1: TForm1
+  Left = 2196
+  Height = 800
+  Top = 311
+  Width = 1100
+  Caption = 'Seminarprojekt'
+  ClientHeight = 800
+  ClientWidth = 1100
+  OnCreate = FormCreate
+  LCLVersion = '2.0.6.0'
+  object OpenGLControl1: TOpenGLControl
+    Left = 0
+    Height = 800
+    Top = 0
+    Width = 800
+    OnPaint = OpenGLControl1Paint
+    OnResize = OpenGLControl1Resize
+  end
+  object LDebug: TLabel
+    Left = 816
+    Height = 21
+    Top = 752
+    Width = 109
+    Caption = 'Console Output'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clRed
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object LDescriptionNodes: TLabel
+    Left = 816
+    Height = 25
+    Top = 24
+    Width = 58
+    Caption = 'Nodes:'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object LDescriptionEdges: TLabel
+    Left = 816
+    Height = 25
+    Top = 88
+    Width = 54
+    Caption = 'Edges:'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object EInputNodes: TEdit
+    Left = 888
+    Height = 29
+    Hint = '5'
+    Top = 56
+    Width = 40
+    Alignment = taRightJustify
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    NumbersOnly = True
+    ParentFont = False
+    TabOrder = 1
+    Text = '30'
+    TextHint = '5'
+  end
+  object EInputEdges: TEdit
+    Left = 888
+    Height = 29
+    Hint = '5'
+    Top = 120
+    Width = 40
+    Alignment = taRightJustify
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    NumbersOnly = True
+    ParentFont = False
+    TabOrder = 2
+    Text = '3'
+    TextHint = '3'
+  end
+  object BGenerateGraph: TButton
+    Left = 968
+    Height = 30
+    Top = 224
+    Width = 111
+    Caption = 'Generieren'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    OnClick = BGenerateGraphClick
+    ParentFont = False
+    TabOrder = 4
+  end
+  object LDescriptionSpace: TLabel
+    Left = 816
+    Height = 25
+    Top = 152
+    Width = 54
+    Caption = 'Space:'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object EInputSpace: TEdit
+    Left = 888
+    Height = 29
+    Hint = '5'
+    Top = 184
+    Width = 40
+    Alignment = taRightJustify
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    NumbersOnly = True
+    ParentFont = False
+    TabOrder = 3
+    Text = '30'
+    TextHint = '30'
+  end
+  object BKeyboardControl: TButton
+    Left = 840
+    Height = 30
+    Top = 712
+    Width = 223
+    Caption = 'Tastatursteuerung'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    OnKeyDown = BKeyboardControlKeyDown
+    ParentFont = False
+    TabOrder = 5
+  end
+  object OnApp: TApplicationProperties
+    OnIdle = OnAppIdle
+    left = 111
+    top = 59
+  end
+end
