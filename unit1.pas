@@ -18,8 +18,12 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    BCalcAlg2: TButton;
     BGenerateGraph: TButton;
+    BVisAlg1: TButton;
     BKeyboardControl: TButton;
+    BCalcAlg1: TButton;
+    BVisAlg2: TButton;
     EInputSpace: TEdit;
     EInputNodes: TEdit;
     EInputEdges: TEdit;
@@ -27,6 +31,8 @@ type
     LDescriptionNodes: TLabel;
     LDebug: TLabel;
     LDescriptionEdges: TLabel;
+    LTitleAlg1: TLabel;
+    LTitleAlg2: TLabel;
     OnApp: TApplicationProperties;
     OpenGLControl1: TOpenGLControl;
     procedure BKeyboardControlKeyDown(Sender: TObject; var Key: Word;
@@ -49,6 +55,8 @@ type
     FX: Double;
     FY: Double;
     FIndex: Integer;
+    FDistance: Double;
+    FPreviousNode: Integer;
     function GetEdge(index: Integer): TEdge;
 
   public
@@ -61,6 +69,8 @@ type
     procedure AddReturnEdge(nodeIndex: Integer; weight: Double = 0);
     property Edge [index: Integer]: TEdge read GetEdge;
     property Index: Integer read FIndex;
+    property Distance: Double read FDistance write FDistance;
+    property PreviousNode: Integer read FPreviousNode write FPreviousNode;
     class procedure AddClosestEdges(var node: TNode; quantity: Integer);
     class function CalcDistance(nodeA, nodeB: TNode): Double;
   end;
@@ -194,7 +204,7 @@ begin
   glBegin(GL_POINTS);
     glVertex2f(node.x, node.y);
   glEnd;
-  DrawText(node.x - 0.0125, node.y - 0.008, IntToStr(node.Index));
+  DrawText(node.x - 0.0125, node.y - 0.008, FloatToStr(node.Distance));
 end;
 
 procedure DrawEdges(node: TNode);
@@ -276,6 +286,8 @@ begin
   FX:=x;
   FY:=y;
   FIndex:=index;
+  FDistance:= -1;
+  FPreviousNode:= -1;
 end;
 
 destructor TNode.Destroy;
@@ -299,8 +311,10 @@ begin
       Inc(FEdgeCount);
       SetLength(FEdges, FEdgeCount);
       FEdges[FEdgeCount - 1].Node:= nodeIndex;
+      // Setze weight auf Distanz
+      IF weight = 0 THEN weight:= CalcDistance(Nodes[FIndex], Nodes[nodeIndex]);
       FEdges[FEdgeCount - 1].Weight:= weight;
-      Nodes[nodeIndex].AddReturnEdge(FIndex);
+      Nodes[nodeIndex].AddReturnEdge(FIndex, weight);
     end;
 end;
 
