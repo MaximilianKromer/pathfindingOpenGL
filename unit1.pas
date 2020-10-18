@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, OpenGLContext, Forms, Controls, Graphics,
-  Dialogs, StdCtrls, ExtCtrls, GLU, GL, LCLType;
+  Dialogs, StdCtrls, ExtCtrls, GLU, GL, LCLType, GLUT;
 
 type
 
@@ -175,9 +175,26 @@ begin
   OpenGLControl1.Invalidate;
 end;
 
-procedure DrawNode(node: TNode);
+procedure DrawText(x, y: Double; text: String);
+var
+  i: Integer;
+  font: Pointer;
 begin
-  glVertex2f(node.x, node.y);
+  glColor3f(1, 1, 1);
+  font:= GLUT_BITMAP_TIMES_ROMAN_10;
+  glRasterPos2f(x, y);
+  FOR i:= 1 TO Length(text) DO
+    glutBitmapCharacter(font, ORD(text[i]));
+
+end;
+
+procedure DrawNode(node: TNode; r, g, b: Double);
+begin
+  glColor3f(r, g, b);
+  glBegin(GL_POINTS);
+    glVertex2f(node.x, node.y);
+  glEnd;
+  DrawText(node.x - 0.0125, node.y - 0.008, IntToStr(node.Index));
 end;
 
 procedure DrawEdges(node: TNode);
@@ -205,13 +222,11 @@ begin
 
   glBegin(GL_QUADS);
 
-    // Green Background
-    glColor3f(0.2, 0.95, 0.2);
+    // WHite Background
+    glColor3f(0.98, 0.98, 0.98);
     glVertex2f(-1, 1);
-    glColor3f(0.2, 0.75, 0.2);
     glVertex2f(-1, -1);
     glVertex2f(1, -1);
-    glColor3f(0.2, 0.95, 0.2);
     glVertex2f(1, 1);
   glEnd;
 
@@ -219,27 +234,25 @@ begin
   glLineWidth(2);
 
   glBegin(GL_LINES);
-    glColor3f(0.1, 0.1, 0.9);
+    glColor3f(0.375, 0.4883, 0.5312);
     for i:=0 to NodesCount - 1 do
       DrawEdges(Nodes[i]);
   glEnd;
 
-  glBegin(GL_POINTS);
-    glColor3f(1, 1, 1);
-    for i:=0 to NodesCount - 1 do
-      DrawNode(Nodes[i]);
 
-    if NodesCount > 0 then
-      begin
-        glColor3f(1, 1, 0);
-        DrawNode(Nodes[SelectedNode]);
-        glColor3f(0, 0.4, 0);
-        DrawNode(Nodes[StartNode]);
-        glColor3f(0.5, 0, 0);
-        DrawNode(Nodes[EndNode]);
+  for i:=0 to NodesCount - 1 do
+    DrawNode(Nodes[i], 0.1484, 0.1953, 0.2187);
 
-      end;
-  glEnd;
+  if NodesCount > 0 then
+    begin
+      glColor3f(1, 1, 0);
+      DrawNode(Nodes[SelectedNode], 0.8984, 0.3164, 0);
+      glColor3f(0, 0.4, 0);
+      DrawNode(Nodes[StartNode], 0.1992, 0.4101, 0.1172);
+      glColor3f(0.5, 0, 0);
+      DrawNode(Nodes[EndNode], 0.7148, 0.1094, 0.1094);
+    end;
+
 
   sleep(30);
 
