@@ -35,9 +35,11 @@ type
     LTitleAlg2: TLabel;
     OnApp: TApplicationProperties;
     OpenGLControl1: TOpenGLControl;
+    procedure BCalcAlg1Click(Sender: TObject);
     procedure BKeyboardControlKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure BGenerateGraphClick(Sender: TObject);
+    procedure BVisAlg1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure OnAppIdle(Sender: TObject; var Done: Boolean);
     procedure OpenGLControl1Paint(Sender: TObject);
@@ -57,6 +59,7 @@ type
     FIndex: Integer;
     FDistance: Double;
     FPreviousNode: Integer;
+    FFinished: Boolean;
     function GetEdge(index: Integer): TEdge;
 
   public
@@ -71,6 +74,7 @@ type
     property Index: Integer read FIndex;
     property Distance: Double read FDistance write FDistance;
     property PreviousNode: Integer read FPreviousNode write FPreviousNode;
+    property Finished: Boolean read FFinished write FFinished;
     class procedure AddClosestEdges(var node: TNode; quantity: Integer);
     class function CalcDistance(nodeA, nodeB: TNode): Double;
   end;
@@ -94,6 +98,19 @@ begin
   EndNode:= 0;
   NodesCount:= 0;
   SetLength(Nodes, NodesCount);
+end;
+
+{ Graph Zurücksetzen als Vorbereitung für Algorithmus}
+procedure ResetNodes;
+VAR
+  i: Integer;
+begin
+  for i:=0 to NodesCount - 1 do
+    begin
+      Nodes[i].Distance:= -1;
+      Nodes[i].PreviousNode:= -1;
+      Nodes[i].Finished:= False;
+    end;
 end;
 
 { TForm1 }
@@ -163,7 +180,6 @@ begin
     end;
 end;
 
-
 { Tastatureingaben auswerten }
 procedure TForm1.BKeyboardControlKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
@@ -177,6 +193,94 @@ begin
   if SelectedNode > NodesCount - 1 then SelectedNode:=0;
   if SelectedNode < 0 then SelectedNode:=NodesCount - 1;
   if Key <> VK_TAB then Key := 0;
+end;
+
+    { __________ Dijkstra __________ }
+procedure TForm1.BCalcAlg1Click(Sender: TObject);
+VAR
+  finished: Boolean;
+  i, u: Integer;
+begin
+  ResetNodes;
+  { Vorbereiten }
+  finished:= False;
+  Nodes[StartNode].Distance:= 0;
+
+  { Hauptschleife }
+  repeat
+    // Knoten mit kleinster Distance finden
+    u:= -1;
+    FOR i:= 0 TO NodesCount - 1 DO
+      begin
+        IF (Nodes[i].Distance > -1) AND (Nodes[i].Finished = False) THEN
+          IF (u = -1) OR (Nodes[i].Distance < Nodes[u].Distance) THEN
+             u:= i;
+      end;
+
+    // Jede Kante zum neuen Knoten als Distanz setzen
+    FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
+      begin
+        IF (Nodes[Nodes[u].GetEdge(i).Node].Distance = -1) OR (Nodes[Nodes[u].GetEdge(i).Node].Distance > (Nodes[u].Distance + Nodes[u].GetEdge(i).Weight)) THEN
+          begin
+            Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
+            Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
+          end;
+      end;
+
+    Nodes[u].Finished:=True;
+
+    // Abbruch bei gefundenem Ziel
+    IF u = EndNode THEN
+      finished:= True;
+
+  until finished;
+end;
+
+    { __________ Dijkstra - Vis __________ }
+procedure TForm1.BVisAlg1Click(Sender: TObject);
+VAR
+  finished: Boolean;
+  i, u: Integer;
+begin
+  ResetNodes;
+  { Vorbereiten }
+  finished:= False;
+  Nodes[StartNode].Distance:= 0;
+
+  { Hauptschleife }
+  repeat
+    Sleep(500);
+
+    // Knoten mit kleinster Distance finden
+    u:= -1;
+    FOR i:= 0 TO NodesCount - 1 DO
+      begin
+        IF (Nodes[i].Distance > -1) AND (Nodes[i].Finished = False) THEN
+          IF (u = -1) OR (Nodes[i].Distance < Nodes[u].Distance) THEN
+             u:= i;
+      end;
+
+    SelectedNode:=u;
+    OpenGLControl1Paint(OpenGLControl1);
+
+    // Jede Kante zum neuen Knoten als Distanz setzen
+    FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
+      begin
+        IF (Nodes[Nodes[u].GetEdge(i).Node].Distance = -1) OR (Nodes[Nodes[u].GetEdge(i).Node].Distance > (Nodes[u].Distance + Nodes[u].GetEdge(i).Weight)) THEN
+          begin
+            Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
+            Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
+            Sleep(500);
+          end;
+      end;
+
+    Nodes[u].Finished:=True;
+
+    // Abbruch bei gefundenem Ziel
+    IF u = EndNode THEN
+      finished:= True;
+
+  until finished;
 end;
 
 procedure TForm1.OnAppIdle(Sender: TObject; var Done: Boolean);
@@ -213,11 +317,33 @@ var
 begin
   for i:=0 to node.EdgeCount - 1 do
     begin
-      glVertex2f(node.x, node.y);
-      glVertex2f(Nodes[node.Edge[i].Node].x, Nodes[node.Edge[i].Node].y);
+      glBegin(GL_LINES);
+        glColor3f(0.7383, 0.7383, 0.7383);
+        glVertex2f(node.x, node.y);
+        glVertex2f(Nodes[node.Edge[i].Node].x, Nodes[node.Edge[i].Node].y);
+      glEnd;
     end;
 end;
 
+procedure DrawEdge(node1, node2: TNode; r, g, b: Double);
+begin
+  glBegin(GL_LINES);
+    glColor3f(r, g, b);
+    glVertex2f(node1.x, node1.y);
+    glVertex2f(node2.x, node2.y);
+  glEnd;
+end;
+
+procedure DrawShortestPath(node: TNode);
+begin
+  IF node.PreviousNode <> -1 THEN
+    begin
+      DrawEdge(node, Nodes[node.PreviousNode], 0.7734, 0.1562, 0.1652);
+      DrawShortestPath(Nodes[node.PreviousNode]);
+    end;
+end;
+
+{ ============ Paint Procedure ============ }
 procedure TForm1.OpenGLControl1Paint(Sender: TObject);
 var
   i: Integer;
@@ -243,24 +369,35 @@ begin
   glPointSize(20);  
   glLineWidth(2);
 
-  glBegin(GL_LINES);
-    glColor3f(0.375, 0.4883, 0.5312);
-    for i:=0 to NodesCount - 1 do
-      DrawEdges(Nodes[i]);
-  glEnd;
+  // alle Kanten zeichnen
+  for i:=0 to NodesCount - 1 do
+    DrawEdges(Nodes[i]);
 
+  // Kürzeste Kante zum Startpunkt zeichnen
+  for i:=0 to NodesCount - 1 do
+    IF Nodes[i].PreviousNode <> -1 THEN
+      IF Nodes[i].Finished THEN
+        DrawEdge(Nodes[i], Nodes[Nodes[i].PreviousNode], 0.0820, 0.3945, 0.7500)
+      ELSE
+        DrawEdge(Nodes[i], Nodes[Nodes[i].PreviousNode], 0.0117, 0.6601, 0.9531);
 
+  // Kürzesten Weg von Start zu Ziel zeichnen
+  if NodesCount > 0 then
+     DrawShortestPath(Nodes[EndNode]);
+
+  // Punkte zeichnen
   for i:=0 to NodesCount - 1 do
     DrawNode(Nodes[i], 0.1484, 0.1953, 0.2187);
 
+  // Spezielle Punkte zeichnen
   if NodesCount > 0 then
-    begin
-      glColor3f(1, 1, 0);
-      DrawNode(Nodes[SelectedNode], 0.8984, 0.3164, 0);
-      glColor3f(0, 0.4, 0);
-      DrawNode(Nodes[StartNode], 0.1992, 0.4101, 0.1172);
-      glColor3f(0.5, 0, 0);
+    begin                                     
+      // Ekndpunkt
       DrawNode(Nodes[EndNode], 0.7148, 0.1094, 0.1094);
+      // Startpunkt
+      DrawNode(Nodes[StartNode], 0.1992, 0.4101, 0.1172);
+      // Ausgewählter Punkt
+      DrawNode(Nodes[SelectedNode], 0.8984, 0.3164, 0);
     end;
 
 
@@ -277,7 +414,7 @@ begin
 end;
 
 
-{ TNode }
+{ ---------------- TNode ---------------- }
 
 constructor TNode.Create(index: Integer; x, y: Double);
 begin
@@ -288,6 +425,7 @@ begin
   FIndex:=index;
   FDistance:= -1;
   FPreviousNode:= -1;
+  FFinished:=False;
 end;
 
 destructor TNode.Destroy;

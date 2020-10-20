@@ -177,6 +177,7 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
+    OnClick = BVisAlg1Click
     ParentFont = False
     TabOrder = 6
   end
@@ -207,6 +208,7 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
+    OnClick = BCalcAlg1Click
     ParentFont = False
     TabOrder = 7
   end
