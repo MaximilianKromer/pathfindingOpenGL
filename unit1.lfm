@@ -257,9 +257,114 @@ object Form1: TForm1
     ParentFont = False
     TabOrder = 9
   end
+  object LTimeAlg1: TLabel
+    AnchorSideRight.Side = asrBottom
+    Left = 1040
+    Height = 21
+    Top = 268
+    Width = 39
+    Anchors = [akTop, akRight]
+    Caption = '?? ms'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object LTimeAlg2: TLabel
+    AnchorSideRight.Side = asrBottom
+    Left = 1040
+    Height = 21
+    Top = 340
+    Width = 39
+    Anchors = [akTop, akRight]
+    Caption = '?? ms'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object BVisAlg3: TButton
+    Left = 1024
+    Height = 30
+    Top = 440
+    Width = 55
+    Caption = 'Vis'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentFont = False
+    TabOrder = 10
+  end
+  object LTitleAlg3: TLabel
+    Left = 816
+    Height = 25
+    Top = 408
+    Width = 30
+    Caption = 'BFS'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object BCalcAlg3: TButton
+    Left = 904
+    Height = 30
+    Top = 440
+    Width = 111
+    Caption = 'Berechnen'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentFont = False
+    TabOrder = 11
+  end
+  object LTimeAlg3: TLabel
+    AnchorSideRight.Side = asrBottom
+    Left = 1040
+    Height = 21
+    Top = 412
+    Width = 39
+    Anchors = [akTop, akRight]
+    Caption = '?? ms'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
   object OnApp: TApplicationProperties
     OnIdle = OnAppIdle
     left = 111
     top = 59
+  end
+  object ET: TEpikTimer
+    StringPrecision = 6
+    WantMilliseconds = True
+    WantDays = False
+    TimebaseSource = SystemTimebase
+    CorrelationMode = OnTimebaseSelect
+    left = 1032
+    top = 40
   end
 end

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, OpenGLContext, Forms, Controls, Graphics,
-  Dialogs, StdCtrls, ExtCtrls, GLU, GL, LCLType, GLUT;
+  Dialogs, StdCtrls, ExtCtrls, GLU, GL, LCLType, EpikTimer, GLUT;
 
 type
 
@@ -19,20 +19,27 @@ type
 
   TForm1 = class(TForm)
     BCalcAlg2: TButton;
+    BCalcAlg3: TButton;
     BGenerateGraph: TButton;
     BVisAlg1: TButton;
     BKeyboardControl: TButton;
     BCalcAlg1: TButton;
     BVisAlg2: TButton;
+    BVisAlg3: TButton;
     EInputSpace: TEdit;
     EInputNodes: TEdit;
     EInputEdges: TEdit;
+    ET: TEpikTimer;
     LDescriptionSpace: TLabel;
     LDescriptionNodes: TLabel;
     LDebug: TLabel;
     LDescriptionEdges: TLabel;
+    LTimeAlg2: TLabel;
+    LTimeAlg3: TLabel;
     LTitleAlg1: TLabel;
     LTitleAlg2: TLabel;
+    LTimeAlg1: TLabel;
+    LTitleAlg3: TLabel;
     OnApp: TApplicationProperties;
     OpenGLControl1: TOpenGLControl;
     procedure BCalcAlg1Click(Sender: TObject);
@@ -202,6 +209,8 @@ VAR
   i, u: Integer;
 begin
   ResetNodes;
+  ET.Clear;
+  ET.Start;
   { Vorbereiten }
   finished:= False;
   Nodes[StartNode].Distance:= 0;
@@ -234,6 +243,8 @@ begin
       finished:= True;
 
   until finished;
+  ET.Stop;
+  LTimeAlg1.Caption:= FloatToStr(ET.Elapsed*1000)  + 'ms';
 end;
 
     { __________ Dijkstra - Vis __________ }
