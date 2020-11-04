@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, OpenGLContext, Forms, Controls, Graphics,
-  Dialogs, StdCtrls, ExtCtrls, GLU, GL, LCLType, EpikTimer, GLUT;
+  Dialogs, StdCtrls, ExtCtrls, GLU, GL, LCLType, ComCtrls, EpikTimer, GLUT;
 
 type
 
@@ -42,11 +42,16 @@ type
     LTitleAlg3: TLabel;
     OnApp: TApplicationProperties;
     OpenGLControl1: TOpenGLControl;
+    TBSpeed: TTrackBar;
     procedure BCalcAlg1Click(Sender: TObject);
+    procedure BCalcAlg2Click(Sender: TObject);
+    procedure BCalcAlg3Click(Sender: TObject);
     procedure BKeyboardControlKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure BGenerateGraphClick(Sender: TObject);
     procedure BVisAlg1Click(Sender: TObject);
+    procedure BVisAlg2Click(Sender: TObject);
+    procedure BVisAlg3Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure OnAppIdle(Sender: TObject; var Done: Boolean);
     procedure OpenGLControl1Paint(Sender: TObject);
@@ -65,6 +70,7 @@ type
     FY: Double;
     FIndex: Integer;
     FDistance: Double;
+    FEstimatedDistance: Double;
     FPreviousNode: Integer;
     FFinished: Boolean;
     function GetEdge(index: Integer): TEdge;
@@ -80,6 +86,7 @@ type
     property Edge [index: Integer]: TEdge read GetEdge;
     property Index: Integer read FIndex;
     property Distance: Double read FDistance write FDistance;
+    property EstimatedDistance: Double read FEstimatedDistance write FEstimatedDistance;
     property PreviousNode: Integer read FPreviousNode write FPreviousNode;
     property Finished: Boolean read FFinished write FFinished;
     class procedure AddClosestEdges(var node: TNode; quantity: Integer);
@@ -91,7 +98,7 @@ type
 var
   Form1: TForm1;
   Nodes: Array of TNode;
-  NodesCount, SelectedNode, StartNode, EndNode: Integer;
+  NodesCount, SelectedNode, StartNode, EndNode, ComparingNode: Integer;
 
 implementation
 
@@ -103,6 +110,7 @@ begin
   SelectedNode:= 0;
   StartNode:= 0;
   EndNode:= 0;
+  ComparingNode:= -1;
   NodesCount:= 0;
   SetLength(Nodes, NodesCount);
 end;
@@ -115,6 +123,7 @@ begin
   for i:=0 to NodesCount - 1 do
     begin
       Nodes[i].Distance:= -1;
+      Nodes[i].EstimatedDistance:= -1;
       Nodes[i].PreviousNode:= -1;
       Nodes[i].Finished:= False;
     end;
@@ -141,6 +150,9 @@ var
 begin
   Reset;
   LDebug.Caption:='';
+  LTimeAlg1.Caption:='?? ms'; 
+  LTimeAlg2.Caption:='?? ms';
+  LTimeAlg3.Caption:='?? ms';
   NodesCount:=StrToInt(EInputNodes.Text);
   edgesNumber:=StrToInt(EInputEdges.Text);
   space:=StrToInt(EInputSpace.Text);
@@ -244,23 +256,23 @@ begin
 
   until finished;
   ET.Stop;
-  LTimeAlg1.Caption:= FloatToStr(ET.Elapsed*1000)  + 'ms';
+  LTimeAlg1.Caption:= Format('%.6f', [ET.Elapsed*1000]) + ' ms';
 end;
 
     { __________ Dijkstra - Vis __________ }
 procedure TForm1.BVisAlg1Click(Sender: TObject);
 VAR
   finished: Boolean;
-  i, u: Integer;
+  i, u, speed: Integer;
 begin
   ResetNodes;
+  speed:=TBSpeed.Position;
   { Vorbereiten }
   finished:= False;
   Nodes[StartNode].Distance:= 0;
 
   { Hauptschleife }
   repeat
-    Sleep(500);
 
     // Knoten mit kleinster Distance finden
     u:= -1;
@@ -272,7 +284,9 @@ begin
       end;
 
     SelectedNode:=u;
+    ComparingNode:= -1;
     OpenGLControl1Paint(OpenGLControl1);
+    Sleep(100 * speed);
 
     // Jede Kante zum neuen Knoten als Distanz setzen
     FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
@@ -281,7 +295,59 @@ begin
           begin
             Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
             Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
-            Sleep(500);
+          end;
+        ComparingNode:=Nodes[u].GetEdge(i).Node;
+        OpenGLControl1Paint(OpenGLControl1);
+        Sleep(65 * speed);
+      end;
+
+    Nodes[u].Finished:=True;
+    ComparingNode:= -1; 
+    OpenGLControl1Paint(OpenGLControl1);
+    Sleep(50 * speed);
+
+    // Abbruch bei gefundenem Ziel
+    IF u = EndNode THEN
+      finished:= True;
+
+  until finished;
+
+  ComparingNode:= -1;
+end;
+
+     { __________ A* __________ }
+procedure TForm1.BCalcAlg2Click(Sender: TObject);
+VAR
+  finished: Boolean;
+  i, u: Integer;
+begin
+  ResetNodes;
+  ET.Clear;
+  ET.Start;
+  { Vorbereiten }
+  finished:= False;
+  Nodes[StartNode].Distance:= 0;
+  Nodes[StartNode].EstimatedDistance:= TNode.CalcDistance(Nodes[StartNode], Nodes[EndNode]);
+
+  { Hauptschleife }
+  repeat
+    // Knoten mit kleinster geschätzter Distance finden
+    u:= -1;
+    FOR i:= 0 TO NodesCount - 1 DO
+      begin
+        IF (Nodes[i].EstimatedDistance > -1) AND (Nodes[i].Finished = False) THEN
+          IF (u = -1) OR (Nodes[i].EstimatedDistance < Nodes[u].EstimatedDistance) THEN
+             u:= i;
+      end;
+
+    // Jede Kante zum neuen Knoten als Distanz setzen
+    FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
+      begin
+        IF (Nodes[Nodes[u].GetEdge(i).Node].Distance = -1) OR (Nodes[Nodes[u].GetEdge(i).Node].Distance > (Nodes[u].Distance + Nodes[u].GetEdge(i).Weight)) THEN
+          begin
+            Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
+            Nodes[Nodes[u].GetEdge(i).Node].EstimatedDistance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight + TNode.CalcDistance(Nodes[Nodes[u].GetEdge(i).Node], Nodes[EndNode]);
+            Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
           end;
       end;
 
@@ -292,6 +358,167 @@ begin
       finished:= True;
 
   until finished;
+
+  ET.Stop;
+  LTimeAlg2.Caption:= Format('%.6f', [ET.Elapsed*1000]) + ' ms';
+end;
+                
+     { __________ A* - Vis __________ }
+procedure TForm1.BVisAlg2Click(Sender: TObject);
+VAR
+  finished: Boolean;
+  i, u, speed: Integer;
+begin
+  ResetNodes; 
+  speed:=TBSpeed.Position;
+  { Vorbereiten }
+  finished:= False;
+  Nodes[StartNode].Distance:= 0;
+  Nodes[StartNode].EstimatedDistance:= TNode.CalcDistance(Nodes[StartNode], Nodes[EndNode]);
+
+  { Hauptschleife }
+  repeat
+    // Knoten mit kleinster geschätzter Distance finden
+    u:= -1;
+    FOR i:= 0 TO NodesCount - 1 DO
+      begin
+        IF (Nodes[i].EstimatedDistance > -1) AND (Nodes[i].Finished = False) THEN
+          IF (u = -1) OR (Nodes[i].EstimatedDistance < Nodes[u].EstimatedDistance) THEN
+             u:= i;
+      end;
+
+    SelectedNode:=u;
+    ComparingNode:= -1;
+    OpenGLControl1Paint(OpenGLControl1);
+    Sleep(100 * speed);
+
+    // Jede Kante zum neuen Knoten als Distanz setzen
+    FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
+      begin
+        IF (Nodes[Nodes[u].GetEdge(i).Node].Distance = -1) OR (Nodes[Nodes[u].GetEdge(i).Node].Distance > (Nodes[u].Distance + Nodes[u].GetEdge(i).Weight)) THEN
+          begin
+            Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
+            Nodes[Nodes[u].GetEdge(i).Node].EstimatedDistance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight + TNode.CalcDistance(Nodes[Nodes[u].GetEdge(i).Node], Nodes[EndNode]);
+            Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
+          end;
+        ComparingNode:=Nodes[u].GetEdge(i).Node;
+        OpenGLControl1Paint(OpenGLControl1);
+        Sleep(65 * speed);
+      end;
+
+    Nodes[u].Finished:=True;
+    ComparingNode:= -1;
+    OpenGLControl1Paint(OpenGLControl1);
+    Sleep(50 * speed);
+
+    // Abbruch bei gefundenem Ziel
+    IF u = EndNode THEN
+      finished:= True;
+
+  until finished;
+
+  ComparingNode:= -1;
+end;
+
+     { __________ BFS __________ }
+procedure TForm1.BCalcAlg3Click(Sender: TObject);
+VAR
+  finished: Boolean;
+  i, u: Integer;
+begin
+  ResetNodes;
+  ET.Clear;
+  ET.Start;
+  { Vorbereiten }
+  finished:= False;
+  Nodes[StartNode].Distance:= 0;
+  Nodes[StartNode].EstimatedDistance:= TNode.CalcDistance(Nodes[StartNode], Nodes[EndNode]);
+
+  repeat
+    // Knoten mit kleinster geschätzter Distance finden
+    u:= -1;
+    FOR i:= 0 TO NodesCount - 1 DO
+      begin
+        IF (Nodes[i].EstimatedDistance > -1) AND (Nodes[i].Finished = False) THEN
+          IF (u = -1) OR (Nodes[i].EstimatedDistance < Nodes[u].EstimatedDistance) THEN
+             u:= i;
+      end;
+
+    // auf jeden anliegenden Knoten Heuristik anwenden
+    FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
+      begin
+        IF Nodes[Nodes[u].GetEdge(i).Node].EstimatedDistance = -1 THEN
+          begin
+            Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
+            Nodes[Nodes[u].GetEdge(i).Node].EstimatedDistance:= TNode.CalcDistance(Nodes[Nodes[u].GetEdge(i).Node], Nodes[EndNode]);
+            Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
+          end;
+      end;
+
+    Nodes[u].Finished:=True;
+
+    IF u = EndNode THEN
+       finished:= True;
+
+  until finished;
+
+  ET.Stop;
+  LTimeAlg3.Caption:= Format('%.6f', [ET.Elapsed*1000]) + ' ms';
+end;
+
+     { __________ BFS - Vis __________ }
+procedure TForm1.BVisAlg3Click(Sender: TObject);
+VAR
+  finished: Boolean;
+  i, u, speed: Integer;
+begin
+  ResetNodes; 
+  speed:=TBSpeed.Position;
+  { Vorbereiten }
+  finished:= False;
+  Nodes[StartNode].Distance:= 0;
+  Nodes[StartNode].EstimatedDistance:= TNode.CalcDistance(Nodes[StartNode], Nodes[EndNode]);
+
+  repeat
+    // Knoten mit kleinster geschätzter Distance finden
+    u:= -1;
+    FOR i:= 0 TO NodesCount - 1 DO
+      begin
+        IF (Nodes[i].EstimatedDistance > -1) AND (Nodes[i].Finished = False) THEN
+          IF (u = -1) OR (Nodes[i].EstimatedDistance < Nodes[u].EstimatedDistance) THEN
+             u:= i;
+      end;
+
+    SelectedNode:=u;
+    ComparingNode:= -1;
+    OpenGLControl1Paint(OpenGLControl1);
+    Sleep(100 * speed);
+
+    // auf jeden anliegenden Knoten Heuristik anwenden
+    FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
+      begin
+        IF Nodes[Nodes[u].GetEdge(i).Node].EstimatedDistance = -1 THEN
+          begin
+            Nodes[Nodes[u].GetEdge(i).Node].Distance:= Nodes[u].Distance + Nodes[u].GetEdge(i).Weight;
+            Nodes[Nodes[u].GetEdge(i).Node].EstimatedDistance:= TNode.CalcDistance(Nodes[Nodes[u].GetEdge(i).Node], Nodes[EndNode]);
+            Nodes[Nodes[u].GetEdge(i).Node].PreviousNode:=u;
+          end;
+        ComparingNode:=Nodes[u].GetEdge(i).Node;
+        OpenGLControl1Paint(OpenGLControl1);
+        Sleep(65 * speed);
+      end;
+
+    Nodes[u].Finished:=True;
+    ComparingNode:= -1;
+    OpenGLControl1Paint(OpenGLControl1);
+    Sleep(50 * speed);
+
+    IF u = EndNode THEN
+       finished:= True;
+
+  until finished;
+
+  ComparingNode:= -1;
 end;
 
 procedure TForm1.OnAppIdle(Sender: TObject; var Done: Boolean);
@@ -319,7 +546,9 @@ begin
   glBegin(GL_POINTS);
     glVertex2f(node.x, node.y);
   glEnd;
-  DrawText(node.x - 0.0125, node.y - 0.008, FloatToStr(node.Distance));
+  IF node.Distance = -1
+     THEN DrawText(node.x - 0.0125, node.y - 0.008, '?')
+     ELSE DrawText(node.x - 0.0125, node.y - 0.008, Format('%.0f', [node.Distance]));
 end;
 
 procedure DrawEdges(node: TNode);
@@ -396,6 +625,9 @@ begin
   if NodesCount > 0 then
      DrawShortestPath(Nodes[EndNode]);
 
+  IF (NodesCount > 0) AND (ComparingNode <> -1) THEN
+    DrawEdge(Nodes[SelectedNode], Nodes[ComparingNode], 0.2196, 0.5569, 0.2353);
+
   // Punkte zeichnen
   for i:=0 to NodesCount - 1 do
     DrawNode(Nodes[i], 0.1484, 0.1953, 0.2187);
@@ -409,6 +641,8 @@ begin
       DrawNode(Nodes[StartNode], 0.1992, 0.4101, 0.1172);
       // Ausgewählter Punkt
       DrawNode(Nodes[SelectedNode], 0.8984, 0.3164, 0);
+      // Vergleichspunkt
+      IF ComparingNode <> -1 THEN DrawNode(Nodes[ComparingNode], 0.2196, 0.5569, 0.2353);
     end;
 
 
@@ -435,6 +669,7 @@ begin
   FY:=y;
   FIndex:=index;
   FDistance:= -1;
+  FEstimatedDistance:= -1;
   FPreviousNode:= -1;
   FFinished:=False;
 end;

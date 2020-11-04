@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 2196
+  Left = 394
   Height = 800
-  Top = 311
+  Top = 305
   Width = 1100
   Caption = 'Seminarprojekt'
   ClientHeight = 800
@@ -224,6 +224,7 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
+    OnClick = BVisAlg2Click
     ParentFont = False
     TabOrder = 8
   end
@@ -254,6 +255,7 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
+    OnClick = BCalcAlg2Click
     ParentFont = False
     TabOrder = 9
   end
@@ -303,6 +305,7 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
+    OnClick = BVisAlg3Click
     ParentFont = False
     TabOrder = 10
   end
@@ -333,6 +336,7 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
+    OnClick = BCalcAlg3Click
     ParentFont = False
     TabOrder = 11
   end
@@ -352,6 +356,17 @@ object Form1: TForm1
     Font.Quality = fqDraft
     ParentColor = False
     ParentFont = False
+  end
+  object TBSpeed: TTrackBar
+    Left = 840
+    Height = 50
+    Top = 496
+    Width = 223
+    Min = 1
+    Position = 10
+    Reversed = True
+    ParentShowHint = False
+    TabOrder = 12
   end
   object OnApp: TApplicationProperties
     OnIdle = OnAppIdle
