@@ -1,12 +1,14 @@
 object Form1: TForm1
-  Left = 394
+  Left = 355
   Height = 800
-  Top = 305
+  Top = 172
   Width = 1100
   Caption = 'Seminarprojekt'
   ClientHeight = 800
   ClientWidth = 1100
+  DefaultMonitor = dmPrimary
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '2.0.8.0'
   object OpenGLControl1: TOpenGLControl
     Left = 0
@@ -35,8 +37,8 @@ object Form1: TForm1
     Left = 816
     Height = 25
     Top = 24
-    Width = 58
-    Caption = 'Nodes:'
+    Width = 64
+    Caption = 'Knoten:'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
     Font.Height = -19
@@ -50,8 +52,8 @@ object Form1: TForm1
     Left = 816
     Height = 25
     Top = 88
-    Width = 54
-    Caption = 'Edges:'
+    Width = 63
+    Caption = 'Kanten:'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
     Font.Height = -19
@@ -119,8 +121,8 @@ object Form1: TForm1
     Left = 816
     Height = 25
     Top = 152
-    Width = 54
-    Caption = 'Space:'
+    Width = 73
+    Caption = 'Abstand:'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
     Font.Height = -19
@@ -179,7 +181,7 @@ object Form1: TForm1
     Font.Quality = fqDraft
     OnClick = BVisAlg1Click
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 7
   end
   object LTitleAlg1: TLabel
     Left = 816
@@ -210,7 +212,7 @@ object Form1: TForm1
     Font.Quality = fqDraft
     OnClick = BCalcAlg1Click
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 6
   end
   object BVisAlg2: TButton
     Left = 1024
@@ -226,7 +228,7 @@ object Form1: TForm1
     Font.Quality = fqDraft
     OnClick = BVisAlg2Click
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 9
   end
   object LTitleAlg2: TLabel
     Left = 816
@@ -257,7 +259,7 @@ object Form1: TForm1
     Font.Quality = fqDraft
     OnClick = BCalcAlg2Click
     ParentFont = False
-    TabOrder = 9
+    TabOrder = 8
   end
   object LTimeAlg1: TLabel
     AnchorSideRight.Side = asrBottom
@@ -307,7 +309,7 @@ object Form1: TForm1
     Font.Quality = fqDraft
     OnClick = BVisAlg3Click
     ParentFont = False
-    TabOrder = 10
+    TabOrder = 11
   end
   object LTitleAlg3: TLabel
     Left = 816
@@ -338,7 +340,7 @@ object Form1: TForm1
     Font.Quality = fqDraft
     OnClick = BCalcAlg3Click
     ParentFont = False
-    TabOrder = 11
+    TabOrder = 10
   end
   object LTimeAlg3: TLabel
     AnchorSideRight.Side = asrBottom
@@ -359,14 +361,50 @@ object Form1: TForm1
   end
   object TBSpeed: TTrackBar
     Left = 840
-    Height = 50
-    Top = 496
+    Height = 34
+    Hint = 'Schnell <--> Langsam'
+    Top = 528
     Width = 223
     Min = 1
     Position = 10
     Reversed = True
+    ShowSelRange = False
     ParentShowHint = False
+    ShowHint = True
     TabOrder = 12
+  end
+  object LSpeedDesc: TLabel
+    AnchorSideRight.Side = asrBottom
+    Left = 840
+    Height = 21
+    Top = 496
+    Width = 217
+    Anchors = [akTop, akRight]
+    Caption = 'Visualisierungsgeschwindigkeit'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
+  object BHelpMessage: TButton
+    Left = 840
+    Height = 30
+    Top = 672
+    Width = 223
+    Caption = 'Erklärung'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    OnClick = BHelpMessageClick
+    ParentFont = False
+    TabOrder = 13
   end
   object OnApp: TApplicationProperties
     OnIdle = OnAppIdle

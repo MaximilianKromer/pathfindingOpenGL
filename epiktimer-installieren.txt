@@ -1,0 +1,9 @@
+Installation:
+
+Starten Sie Lazarus.
+Öffnen Sie im Menü "Komponenten -> Package-Datei öffnen" die Datei "etpackage.lpk".
+Kompilieren Sie die Komponente testweise, um sicher zu gehen, dass sie vollständig ist.
+Erstellen Sie Lazarus erneut unter "Werkzeuge -> Lazarus erstellen"
+Die Komponente EpicTimer erscheint nun in dem Reiter "System" (Stoppuhr-Icon)
+
+https://wiki.freepascal.org/EpikTimer/de

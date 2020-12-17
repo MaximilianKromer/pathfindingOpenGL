@@ -1,3 +1,4 @@
+{ Autor: Kromer, Maximilian }
 unit Unit1;
 
 {$mode objfpc}{$H+}
@@ -21,6 +22,7 @@ type
     BCalcAlg2: TButton;
     BCalcAlg3: TButton;
     BGenerateGraph: TButton;
+    BHelpMessage: TButton;
     BVisAlg1: TButton;
     BKeyboardControl: TButton;
     BCalcAlg1: TButton;
@@ -36,6 +38,7 @@ type
     LDescriptionEdges: TLabel;
     LTimeAlg2: TLabel;
     LTimeAlg3: TLabel;
+    LSpeedDesc: TLabel;
     LTitleAlg1: TLabel;
     LTitleAlg2: TLabel;
     LTimeAlg1: TLabel;
@@ -46,6 +49,7 @@ type
     procedure BCalcAlg1Click(Sender: TObject);
     procedure BCalcAlg2Click(Sender: TObject);
     procedure BCalcAlg3Click(Sender: TObject);
+    procedure BHelpMessageClick(Sender: TObject);
     procedure BKeyboardControlKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure BGenerateGraphClick(Sender: TObject);
@@ -138,6 +142,49 @@ begin
   LDebug.Caption:='';
 
   Reset;
+end;
+
+ { Hilfe anzeigen }
+procedure TForm1.BHelpMessageClick(Sender: TObject);
+begin
+  Application.MessageBox('Graphen generieren:' + sLineBreak +
+                         ' - Knoten: [Anzahl der Knoten]' + sLineBreak +
+                         ' - Kanten: [mindest Anzahl der Kanten pro Knoten]' + sLineBreak +
+                         ' - Abstand: [mindest Abstand zwischen zwei Knoten]' + sLineBreak +
+                         '            (größere Werte -> gleichmäßigerer Graph)' + sLineBreak +
+                         '            (Wert zu groß -> Kein Graph)' + sLineBreak +
+                         ' - Generieren -> erstellt einen zufälligen Graphen basierend auf den Parametern' + sLineBreak +
+                         '' + sLineBreak +
+                         'Algorithmen:' + sLineBreak +
+                         ' - [Name]     [Zeit in ms]' + sLineBreak +
+                         ' - Berechnen -> führt Algorithmus aus und speichert die Zeit' + sLineBreak +
+                         ' - Vis -> stellt den Algorithmus Schritt für Schritt dar' + sLineBreak +
+                         ' - Visualisierungsgeschwindigkeit ? Links: Schneller / Rechts: Langsamer' + sLineBreak +
+                         '' + sLineBreak +
+                         'Tastatursteuerung:' + sLineBreak +
+                         ' - muss angeklickt / ausgewählt sein' + sLineBreak +
+                         ' - Pfeiltasten:' + sLineBreak +
+                         '   [<-]: vorheriger Knoten' + sLineBreak +
+                         '   [->]: nächster Knoten' + sLineBreak +
+                         ' - Tasten drücken:' + sLineBreak +
+                         '   [S]: Startknoten' + sLineBreak +
+                         '   [E]: Endknoten / Ziel' + sLineBreak +
+                         '' + sLineBreak +
+                         'Farben & Bedeutung' + sLineBreak +
+                         ' - (orange)         ausgewählter Knoten' + sLineBreak +
+                         ' - (grün)           Startknoten' + sLineBreak +
+                         ' - (rot)            Endknoten' + sLineBreak +
+                         '' + sLineBreak +
+                         ' - (rot)       kürzester Weg vom Start zum Ziel*' + sLineBreak +
+                         ' - (dunkelblau)          "definitiv" kürzester Weg vom jeweiligen Knoten Richtung Startknoten*' + sLineBreak +
+                         ' - (hellblau)            "bisher" kürzester Weg vom jeweiligen Knoten Richtung Startknoten*' + sLineBreak +
+                         ' - (grün)                aktuell überprüfte Kante' + sLineBreak +
+                         '' + sLineBreak +
+                         '*Ausnahme beim BFS (kürzeste Strecke nicht garantiert)' + sLineBreak +
+                         '' + sLineBreak +  
+                         '' + sLineBreak +
+                         'Erstellt durch Maximilian Kromer im Rahmen der Seminararbeit          11.12.2020',
+                         'Anleitung');
 end;
 
 { Zufälligen Graphen generieren }
@@ -286,7 +333,7 @@ begin
     SelectedNode:=u;
     ComparingNode:= -1;
     OpenGLControl1Paint(OpenGLControl1);
-    Sleep(100 * speed);
+    Sleep(Round(1000 / sqr(speed)));
 
     // Jede Kante zum neuen Knoten als Distanz setzen
     FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
@@ -298,13 +345,13 @@ begin
           end;
         ComparingNode:=Nodes[u].GetEdge(i).Node;
         OpenGLControl1Paint(OpenGLControl1);
-        Sleep(65 * speed);
+        Sleep(Round(650 / sqr(speed)));
       end;
 
     Nodes[u].Finished:=True;
     ComparingNode:= -1; 
     OpenGLControl1Paint(OpenGLControl1);
-    Sleep(50 * speed);
+    Sleep(Round(500 / sqr(speed)));
 
     // Abbruch bei gefundenem Ziel
     IF u = EndNode THEN
@@ -390,7 +437,7 @@ begin
     SelectedNode:=u;
     ComparingNode:= -1;
     OpenGLControl1Paint(OpenGLControl1);
-    Sleep(100 * speed);
+    Sleep(Round(1000 / sqr(speed)));
 
     // Jede Kante zum neuen Knoten als Distanz setzen
     FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
@@ -403,13 +450,13 @@ begin
           end;
         ComparingNode:=Nodes[u].GetEdge(i).Node;
         OpenGLControl1Paint(OpenGLControl1);
-        Sleep(65 * speed);
+        Sleep(Round(650 / sqr(speed)));
       end;
 
     Nodes[u].Finished:=True;
     ComparingNode:= -1;
     OpenGLControl1Paint(OpenGLControl1);
-    Sleep(50 * speed);
+    Sleep(Round(500 / sqr(speed)));
 
     // Abbruch bei gefundenem Ziel
     IF u = EndNode THEN
@@ -492,7 +539,7 @@ begin
     SelectedNode:=u;
     ComparingNode:= -1;
     OpenGLControl1Paint(OpenGLControl1);
-    Sleep(100 * speed);
+    Sleep(Round(1000 / sqr(speed)));
 
     // auf jeden anliegenden Knoten Heuristik anwenden
     FOR i:= 0 TO Nodes[u].EdgeCount - 1 DO
@@ -505,13 +552,13 @@ begin
           end;
         ComparingNode:=Nodes[u].GetEdge(i).Node;
         OpenGLControl1Paint(OpenGLControl1);
-        Sleep(65 * speed);
+        Sleep(Round(650 / sqr(speed)));
       end;
 
     Nodes[u].Finished:=True;
     ComparingNode:= -1;
     OpenGLControl1Paint(OpenGLControl1);
-    Sleep(50 * speed);
+    Sleep(Round(500 / sqr(speed)));
 
     IF u = EndNode THEN
        finished:= True;
@@ -547,7 +594,7 @@ begin
     glVertex2f(node.x, node.y);
   glEnd;
   IF node.Distance = -1
-     THEN DrawText(node.x - 0.0125, node.y - 0.008, '?')
+     THEN DrawText(node.x - 0.0125, node.y - 0.008, '??')
      ELSE DrawText(node.x - 0.0125, node.y - 0.008, Format('%.0f', [node.Distance]));
 end;
 
@@ -634,8 +681,12 @@ begin
 
   // Spezielle Punkte zeichnen
   if NodesCount > 0 then
-    begin                                     
-      // Ekndpunkt
+    begin
+      { -- Für alternative Bedienmethode -- (beim Experiment genutzt)
+      StartNode:= StrToInt(EInputStartNode.Text);  
+      EndNode:= StrToInt(EInputEndNode.Text); }
+
+      // Endpunkt
       DrawNode(Nodes[EndNode], 0.7148, 0.1094, 0.1094);
       // Startpunkt
       DrawNode(Nodes[StartNode], 0.1992, 0.4101, 0.1172);
