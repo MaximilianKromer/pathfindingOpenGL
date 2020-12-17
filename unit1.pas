@@ -36,6 +36,7 @@ type
     LDescriptionNodes: TLabel;
     LDebug: TLabel;
     LDescriptionEdges: TLabel;
+    LSpeedDesc1: TLabel;
     LTimeAlg2: TLabel;
     LTimeAlg3: TLabel;
     LSpeedDesc: TLabel;

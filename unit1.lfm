@@ -406,6 +406,23 @@ object Form1: TForm1
     ParentFont = False
     TabOrder = 13
   end
+  object LSpeedDesc1: TLabel
+    AnchorSideRight.Side = asrBottom
+    Left = 842
+    Height = 21
+    Top = 560
+    Width = 215
+    Anchors = [akTop, akRight]
+    Caption = 'schnell                           langsam'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    ParentColor = False
+    ParentFont = False
+  end
   object OnApp: TApplicationProperties
     OnIdle = OnAppIdle
     left = 111
